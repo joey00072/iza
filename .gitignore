@@ -1,0 +1,39 @@
+# Compiled Object files, Static and Dynamic libs (Shared Objects)
+*.o
+*.a
+*.so
+*.dylib
+
+# Folders
+bin/
+vendor/
+
+# Executable files
+*.exe
+*.out
+*.dll
+
+# Log and data files
+*.log
+*.dat
+*.swo
+*.swp
+
+# OS generated files
+.DS_Store*
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# Go specific
+*.test
+*.test.*
+go.sum
+!go.mod
+
+# IDE specific
+.idea/
+.vscode/
+*.swp
+*~
+.project

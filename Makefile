@@ -7,6 +7,8 @@ RELEASE := $(VERSION)-$(BUILD)
 # Go related variables.
 GOBASE := $(shell pwd)
 GOFILES := $(wildcard *.go)
+BINARY_DIR := $(GOBASE)/bin
+BINARY_NAME := iza
 
 .PHONY: all build clean test help default check-zsh-completions
 
@@ -18,7 +20,8 @@ all: check-zsh-completions build test
 # Build the binary for the current platform.
 build: 
 	@echo "Building $(MODULE) $(RELEASE)"
-	@go build -ldflags "-X main.Version=$(RELEASE)" -o $(GOBASE)/bin/$(MODULE) $(GOFILES)
+	@mkdir -p $(BINARY_DIR)
+	@go build -ldflags "-X main.Version=$(RELEASE)" -o $(BINARY_DIR)/$(BINARY_NAME) $(GOFILES)
 
 # Test all the Go files.
 test:
@@ -26,7 +29,7 @@ test:
 
 # Clean up the project: remove created binaries and coverage files.
 clean: 
-	@-rm $(GOBASE)/bin/$(MODULE) 2>/dev/null
+	@-rm $(BINARY_DIR)/$(BINARY_NAME) 2>/dev/null
 	@-rm coverage.txt 2>/dev/null
 
 # Check if Zsh completions directory exists.

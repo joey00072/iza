@@ -1,27 +1,43 @@
 /*
 Copyright © 2024 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
 import (
 	"fmt"
 
+	pkg "github.com/joey00072/iza/pkg"
+	types "github.com/joey00072/iza/pkg/types"
 	"github.com/spf13/cobra"
 )
+
+// type PullImageOptions struct {
+//     ImageName   string
+//     TarballPath string
+//     CachePath   string // Optional, path to cache the image
+// }
+// PullImageOptions holds the options for pulling an image.
+
+// pkg.PullImageOptions on pkg.go.dev
 
 // pullCmd represents the pull command
 var pullCmd = &cobra.Command{
 	Use:   "pull",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Pull Continer Image (eg. ubuntu, alpine, etc.)",
+	Long: `Pull images from a registry (only docker.io supported currently):
+	Example: iza pull ubuntu
+	`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("pull called")
+		if len(args) == 0 {
+			fmt.Println("Error: Please specify the image name")
+			fmt.Println("Example: iza pull alpine")
+			return
+		}
+		imageOpt := types.ImageOptions{
+			ImageName:   args[0],
+			TarballPath: args[0] + ".tar",
+		}
+		pkg.PullImage(imageOpt)
 	},
 }
 
