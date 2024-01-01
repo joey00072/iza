@@ -1,5 +1,5 @@
 package types
 
 const (
-	DefaultCachePath = "./"
+	DefaultCachePath = "./tmp"
 )

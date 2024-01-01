@@ -7,11 +7,13 @@
 # Folders
 bin/
 vendor/
+tmp/
 
 # Executable files
 *.exe
 *.out
 *.dll
+*tar
 
 # Log and data files
 *.log
