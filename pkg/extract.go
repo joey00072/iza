@@ -45,15 +45,16 @@ func ExtractImage(imageOpt types.ImageOptions) (*types.Container, error) {
 
 	conatinerName := strings.Replace(manifest.Config, "sha256:", "", -1)
 	containerDir := filepath.Join(path, conatinerName)
-	containerExits, err := utils.DirExists(containerDir)
-	if err != nil {
-		return nil, fmt.Errorf("error checking container dir: %w", err)
-	}
+	// containerExits, err := utils.DirExists(containerDir)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("error checking container dir: %w", err)
+	// }
 
-	if containerExits {
-		fmt.Printf("Container alread exits at %v \n", conatinerName)
-		return nil, fmt.Errorf("Container Dir alread exits at %v", containerDir)
-	}
+	// if containerExits {
+	// 	fmt.Printf("Container alread exits at %v \n", conatinerName)
+
+	// 	return nil, fmt.Errorf("Container Dir alread exits at %v", containerDir)
+	// }
 
 	err = utils.EnsurePathExists(containerDir, createIfdontExist)
 	if err != nil {

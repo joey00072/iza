@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/joey00072/iza/pkg"
 	types "github.com/joey00072/iza/pkg/types"
@@ -22,15 +23,15 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-
 		if len(args) == 0 {
 			fmt.Println("Error: Please specify the image name")
 			fmt.Println("Example: iza pull alpine")
 			return
 		}
+		tarPath := strings.ReplaceAll(args[0], "/", "-") + ".tar"
 		imageOpt := types.ImageOptions{
 			ImageName:   args[0],
-			TarballPath: args[0] + ".tar",
+			TarballPath: tarPath,
 		}
 		err := pkg.Run(imageOpt, args)
 		if err != nil {

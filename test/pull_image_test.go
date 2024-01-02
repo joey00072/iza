@@ -20,7 +20,7 @@ func TestPullImage(t *testing.T) {
 			name: "Valid Image Without Cache",
 			opts: types.ImageOptions{
 				ImageName:   "hello-world", // Use an image that is universally available and small in size
-				TarballPath: "/tmp/hello-world.tar",
+				TarballPath: "hello-world.tar",
 			},
 			expectError: false,
 		},
@@ -28,7 +28,7 @@ func TestPullImage(t *testing.T) {
 			name: "Invalid Image Name",
 			opts: types.ImageOptions{
 				ImageName:   "nonexistent-image",
-				TarballPath: "/tmp/nonexistent.tar",
+				TarballPath: "nonexistent.tar",
 			},
 			expectError: true,
 		},

@@ -4,8 +4,6 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
-
 	pkg "github.com/joey00072/iza/pkg"
 	"github.com/spf13/cobra"
 )
@@ -17,7 +15,6 @@ var cprocessCmd = &cobra.Command{
 	Long: `This is used to Setup the container runtime process.
 	eg setting up hostname, enviourment variables etc.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Running cprocess...")
 		pkg.RunContainer(args)
 	},
 }

@@ -37,7 +37,10 @@ var pullCmd = &cobra.Command{
 			ImageName:   args[0],
 			TarballPath: args[0] + ".tar",
 		}
-		pkg.PullImage(imageOpt)
+		if err := pkg.PullImage(imageOpt); err != nil {
+			fmt.Printf("Error Pulling Image: %v \n", err)
+			return
+		}
 	},
 }
 

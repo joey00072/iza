@@ -34,9 +34,10 @@ type Image struct {
 	Comment string
 	Created string
 
-	Author       string
-	Config       *Config
-	Architecture string
+	Author          string
+	Config          *Config
+	Architecture    string
+	ContainerConfig *Config `json:"container_config"`
 
 	Os string
 

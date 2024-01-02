@@ -3,6 +3,8 @@ package pkg
 import (
 	"context"
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/google/go-containerregistry/pkg/crane"
 	"github.com/google/go-containerregistry/pkg/name"
@@ -57,11 +59,24 @@ func PullImage(imageOpt types.ImageOptions) error {
 
 	imageMap[imageName] = img
 
+	tarballPath = strings.Replace(tarballPath, "/", "-", -1)
+
 	// Pull the image from the registry and save it as a tarball
 	if err := crane.MultiSave(imageMap, tarballPath); err != nil {
 		return fmt.Errorf("error saving image %s as a tarball: %w", imageName, err)
 	}
 
 	fmt.Printf("Successfully saved %s as a tarball at %s\n", imageName, tarballPath)
+	return nil
+}
+
+func createFileIfNotExists(filePath string) error {
+	// Attempt to create the file. If the file already exists, an error will be returned.
+	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_EXCL, 0666)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
 	return nil
 }
