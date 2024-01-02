@@ -25,7 +25,7 @@ although this is tiny and not OCI compilent,it's still pretty powerfull <br>
 
 you can run nginx with 
 ![Alt text](./imgs/image.png)
- (no portmapping requiredusing host network)
+ (no port mapping required using host network)
 
 ### Build
 
