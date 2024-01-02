@@ -47,10 +47,8 @@ type Image struct {
 }
 
 type Container struct {
-	ID       string
-	Dir      string
-	Image    *Image
-	ImageDir string
+	ID  string
+	Dir string
 }
 
 type Config struct {

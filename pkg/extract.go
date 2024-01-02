@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -15,15 +16,19 @@ import (
 )
 
 func ExtractImage(imageOpt types.ImageOptions) (*types.Container, error) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return nil, fmt.Errorf("error getting current working directory: %w", err)
+	}
 	path := imageOpt.CachePath
 	if path == "" {
-		path = types.DefaultCachePath
+		path = filepath.Join(cwd, types.DefaultCachePath)
 	}
 
 	path = filepath.Join(path, imageOpt.ImageName)
 
 	createIfdontExist := true
-	err := utils.EnsurePathExists(path, createIfdontExist)
+	err = utils.EnsurePathExists(path, createIfdontExist)
 	if err != nil {
 		return nil, fmt.Errorf("error ensuring path exists: %w", err)
 	}
@@ -39,7 +44,6 @@ func ExtractImage(imageOpt types.ImageOptions) (*types.Container, error) {
 	manifest, err := ReadManifest(manifestPath)
 
 	conatinerName := strings.Replace(manifest.Config, "sha256:", "", -1)
-	fmt.Println("Conatiner Name:", conatinerName)
 	containerDir := filepath.Join(path, conatinerName)
 	containerExits, err := utils.DirExists(containerDir)
 	if err != nil {
@@ -57,24 +61,18 @@ func ExtractImage(imageOpt types.ImageOptions) (*types.Container, error) {
 	}
 
 	for _, layer := range manifest.Layers {
-		targz := filepath.Join(path, layer)
-		fmt.Printf("targz: %v \n", targz)
-		err = ExtractTar(targz, containerDir, true)
-		if err != nil {
-			return nil, fmt.Errorf("error extracting tarball: %w", err)
-		}
-	}
+		tarGzFile := filepath.Join(path, layer)
+		exec.Command("tar", "-C", containerDir, "-xzf", tarGzFile).Run()
+		// if err != nil {
+		// 	fmt.Println("Error during extraction:", err)
+		// 	return nil, fmt.Errorf("error extracting tarball: %w", err)
+		// }
 
-	image, err := ReadImage(filepath.Join(path, manifest.Config))
-	if err != nil {
-		return nil, fmt.Errorf("error reading image: %w", err)
 	}
 
 	conatiner := &types.Container{
-		ID:       conatinerName,
-		Dir:      containerDir,
-		Image:    image,
-		ImageDir: path,
+		ID:  conatinerName,
+		Dir: path,
 	}
 
 	return conatiner, nil
@@ -99,28 +97,6 @@ func ReadManifest(filename string) (*types.Manifest, error) {
 	}
 
 	return &manifest[0], nil
-}
-
-func ReadImage(filename string) (*types.Image, error) {
-	file, err := os.Open(filename)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	bytes, err := io.ReadAll(file)
-	if err != nil {
-		return nil, err
-	}
-
-	var image types.Image
-	err = json.Unmarshal(bytes, &image)
-	if err != nil {
-		return nil, err
-	}
-
-	return &image, nil
-
 }
 
 func ExtractTar(tarPath, destPath string, gz bool) error {
@@ -171,4 +147,68 @@ func ExtractTar(tarPath, destPath string, gz bool) error {
 	}
 
 	return nil
+}
+func Untar(dst string, r io.Reader) error {
+
+	gzr, err := gzip.NewReader(r)
+	if err != nil {
+		return err
+	}
+	defer gzr.Close()
+
+	tr := tar.NewReader(gzr)
+
+	for {
+		header, err := tr.Next()
+
+		switch {
+
+		// if no more files are found return
+		case err == io.EOF:
+			return nil
+
+		// return any other error
+		case err != nil:
+			return err
+
+		// if the header is nil, just skip it (not sure how this happens)
+		case header == nil:
+			continue
+		}
+
+		// the target location where the dir/file should be created
+		target := filepath.Join(dst, header.Name)
+
+		// the following switch could also be done using fi.Mode(), not sure if there
+		// a benefit of using one vs. the other.
+		// fi := header.FileInfo()
+
+		// check the file type
+		switch header.Typeflag {
+
+		// if its a dir and it doesn't exist create it
+		case tar.TypeDir:
+			if _, err := os.Stat(target); err != nil {
+				if err := os.MkdirAll(target, 0755); err != nil {
+					return err
+				}
+			}
+
+		// if it's a file create it
+		case tar.TypeReg:
+			f, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
+			if err != nil {
+				return err
+			}
+
+			// copy over contents
+			if _, err := io.Copy(f, tr); err != nil {
+				return err
+			}
+
+			// manually close here after each file operation; defering would cause each file close
+			// to wait until all operations have completed.
+			f.Close()
+		}
+	}
 }

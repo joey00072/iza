@@ -32,7 +32,7 @@ to quickly create a Cobra application.`,
 			ImageName:   args[0],
 			TarballPath: args[0] + ".tar",
 		}
-		err := pkg.RunContainer(imageOpt, args)
+		err := pkg.Run(imageOpt, args)
 		if err != nil {
 			fmt.Printf("Error Running Container: %v \n", err)
 			return
